@@ -16,20 +16,27 @@ if(isset($_POST["firstName"])){
     $storage->createOrder($meno, $priezvisko, $datum, "Open");
     header("Refresh:0");
 }
-/*elseif (isset($_POST["id"])){
-    $id = $_POST["id"];
-    $storage->deleteRow($id);
-    header("Refresh:0");
-}*/
 elseif (isset($_GET['delete'])){
-    $storage->deleteRow($_GET['delete']);
-    //header('Location: http://kalusova.prevadzka.eu/semestralka/dashboard.php');
+    $idNum = intval($_GET['delete']);
+    $storage->deleteRow($idNum);
+    header('Location: dashboard.php');
 }
-elseif (isset($_POST["id_state"])){
-    $id = $_POST["id_state"];
-    $state = $_POST["state"];
+
+elseif (isset($_GET['editState'])){
+    $id = intval($_GET['editState']);
+    $state = "Sent";
     $storage->editState($id, $state);
-    header("Refresh:0");
+    header('Location: dashboard.php');
+}
+
+elseif (isset($_GET['edit'])){
+    $id = intval($_GET['edit']);
+    $meno=$_POST["firstName"];
+    $priezvisko=$_POST["lastName"];
+    $datum = $_POST["date"];
+    $stav = 'Open';
+    $storage->editOrder($id, $meno, $priezvisko, $datum, $stav);
+    header('Location: dashboard.php');
 }
 elseif (isset($_POST["id_end"])){
     $id = $_POST["id_end"];
@@ -37,8 +44,6 @@ elseif (isset($_POST["id_end"])){
     $storage->editEnd($id, $end);
     header("Refresh:0");
 }
-
-
 
 ob_end_flush();
 ?>
@@ -81,6 +86,9 @@ ob_end_flush();
                     <a class="dropdown-item" href="#">All orders</a>
                 </div>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="form.html">New Order <span class="sr-only">(current)</span></a>
+            </li>
         </ul>
     </div>
 
@@ -115,54 +123,15 @@ ob_end_flush();
                     <td><?php echo $order->getEnd()?></td>
                     <td><?php echo $order->getState()?></td>
                     <td>
-                        <a href="?delete=<?php $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png" alt="Delete" style="width:20px;height:20px;"></a>
-                        <a href="?edit=<?php $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2017/06/21/07/51/icon-2426370_1280.png" alt="Edit" style="width:20px;height:20px;"> </a>
+                        <a href="?delete=<?= $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png" alt="Delete" style="width:20px;height:20px;"> </a>
+                        <a href="?edit=<?= $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2017/06/21/07/51/icon-2426370_1280.png" alt="Edit" style="width:20px;height:20px;"> </a>
+                        <a href="?editState=<?= $order->getId()?>" href="form.html"> <img src="https://cdn1.iconfinder.com/data/icons/jetflat-multimedia-vol-4/90/0042_089_check_well_ready_okey-512.png" alt="EditState" style="width:20px;height:20px;"> </a>
                     </td>
                 </tr>
                 <?php
             } ?>
             </thead>
         </table>
-    </div>
-</form>
-
-<form action="dashboard.php" method="post">
-    <div class="container" >
-        <h3>New order</h3>
-        <p>Please Enter following information</p>
-        <form class="needs-validation" novalidate>
-            <label for="firstName">First name</label>
-            <input type="text" class="w3-input w3-border" style="width:20%" name="firstName" id="firstName" placeholder="" value="" required>
-            <div class="invalid-feedback">
-                Valid first name is required.
-            </div>
-            <label for="lastName">Last name</label>
-            <input type="text" class="w3-input w3-border" style="width:20%" name="lastName" id="lastName" placeholder="" value="" required>
-            <div class="invalid-feedback">
-                Valid last name is required.
-            </div>
-            <label for="date">Date</label>
-            <input type="text" class="w3-input w3-border" style="width:20%" name="date" id="date" placeholder="YYYY-MM-DD" required>
-            <div class="invalid-feedback">
-                Please enter starting date.
-            </div>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Save order</button>
-            <br>
-
-        </form>
-    </div>
-</form>
-
-<form action="dashboard.php" method="post">
-    <div class="container" >
-        <h3>Edit State</h3>
-        <p>Please Enter ID of order that you want to EDIT</p>
-        <label for="id">Order ID</label>
-        <input type="text" class="w3-input w3-border" style="width:20%" name="id_state" id="id_state" placeholder="Enter Order ID" value="" required>
-        <label for="id">State</label>
-        <input type="text" class="w3-input w3-border" style="width:20%" name="state" id="state" placeholder="Enter state" value="" required>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Edit</button>
-        <br>
     </div>
 </form>
 
@@ -179,17 +148,6 @@ ob_end_flush();
     </div>
 </form>
 
-<form action="dashboard.php" method="post">
-    <div class="container" >
-        <h3>Delete order</h3>
-        <p>Please Enter ID of order that you want to DELETE</p>
-        <label for="id">Order ID</label>
-        <input type="text" class="w3-input w3-border" style="width:20%" name="id" id="id" placeholder="Enter Order ID" value="" required>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Delete</button>
-        <br>
-    </div>
-</form>
-
 <script>
     function validateDate() {
         let regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
@@ -202,6 +160,7 @@ ob_end_flush();
         }
     }
 </script>
+
 
 </body>
 </html>

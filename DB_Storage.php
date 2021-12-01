@@ -50,10 +50,9 @@ class DB_Storage
         }
     }
 
-    public function deleteRow(string $id) : void
+    public function deleteRow(int $id) : void
     {
-        $idNum = intval($id);
-        $sql = "DELETE FROM Orders WHERE id='$idNum'";
+        $sql = "DELETE FROM Orders WHERE id=$id";
         if ($this->mysqli->query($sql) === TRUE) {
             echo "Record deleted successfully";
         } else {
@@ -64,6 +63,16 @@ class DB_Storage
     public function editState($id, $state) : void
     {
         $sql = "UPDATE Orders SET state='$state' WHERE id=$id";
+        if ($this->mysqli->query($sql) === TRUE) {
+            echo "Record updated successfully";
+        } else {
+            echo "Error updating record: " . $this->mysqli->error;
+        }
+    }
+
+    public function editOrder($id, $name, $surname, $accDate, $state) : void
+    {
+        $sql = "UPDATE Orders SET meno= '$name', priezvisko='$surname', start='$accDate', state='$state' WHERE id=$id";
         if ($this->mysqli->query($sql) === TRUE) {
             echo "Record updated successfully";
         } else {
