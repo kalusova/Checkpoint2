@@ -50,9 +50,10 @@ class DB_Storage
         }
     }
 
-    public function deleteRow(int $id) : void
+    public function deleteRow(string $id) : void
     {
-        $sql = "DELETE FROM Orders WHERE id=$id";
+        $idNum = intval($id);
+        $sql = "DELETE FROM Orders WHERE id='$idNum'";
         if ($this->mysqli->query($sql) === TRUE) {
             echo "Record deleted successfully";
         } else {

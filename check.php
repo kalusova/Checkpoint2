@@ -13,6 +13,7 @@ if ($result = $mysqli -> query($sql)) {
     while ($row = mysqli_fetch_assoc($result)) {
         $login_ok=$row["pocet"];
     }
+
 }
 
 $result -> free_result();

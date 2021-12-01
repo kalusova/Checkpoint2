@@ -12,14 +12,18 @@ if(isset($_POST["firstName"])){
     $meno=$_POST["firstName"];
     $priezvisko=$_POST["lastName"];
     $datum = $_POST["date"];
-    $login_ok = 0;
+    //$login_ok = 0;
     $storage->createOrder($meno, $priezvisko, $datum, "Open");
     header("Refresh:0");
 }
-elseif (isset($_POST["id"])){
+/*elseif (isset($_POST["id"])){
     $id = $_POST["id"];
     $storage->deleteRow($id);
     header("Refresh:0");
+}*/
+elseif (isset($_GET['delete'])){
+    $storage->deleteRow($_GET['delete']);
+    //header('Location: http://kalusova.prevadzka.eu/semestralka/dashboard.php');
 }
 elseif (isset($_POST["id_state"])){
     $id = $_POST["id_state"];
@@ -33,6 +37,8 @@ elseif (isset($_POST["id_end"])){
     $storage->editEnd($id, $end);
     header("Refresh:0");
 }
+
+
 
 ob_end_flush();
 ?>
@@ -81,7 +87,7 @@ ob_end_flush();
     <form class="form-inline my-2 my-lg-0">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        <button type="submit" class="btn btn-outline-success my-2 my-sm-0" formaction="login.html">Log out</button>
+        <button type="submit" class="btn btn-outline-success my-2 my-sm-0" formaction="index.html">Log out</button>
     </form>
 </nav>
 <form action="dashboard.php" method="post">
@@ -96,6 +102,7 @@ ob_end_flush();
                 <th scope="col">Acceptance Date</th>
                 <th scope="col">Closing Date</th>
                 <th scope="col">State</th>
+                <th scope="col">Actions</th>
             </tr>
 
 
@@ -107,6 +114,10 @@ ob_end_flush();
                     <td><?php echo $order->getStart()?></td>
                     <td><?php echo $order->getEnd()?></td>
                     <td><?php echo $order->getState()?></td>
+                    <td>
+                        <a href="?delete=<?php $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png" alt="Delete" style="width:20px;height:20px;"></a>
+                        <a href="?edit=<?php $order->getId()?>"> <img src="https://cdn.pixabay.com/photo/2017/06/21/07/51/icon-2426370_1280.png" alt="Edit" style="width:20px;height:20px;"> </a>
+                    </td>
                 </tr>
                 <?php
             } ?>
