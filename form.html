@@ -24,7 +24,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Overview <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="dashboard.php">Overview <span class="sr-only"></span></a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -50,7 +50,7 @@
     </form>
 </nav>
 
-<form action="dashboard.php" method="post">
+<form id = "formSave" action="dashboard.php" method="post">
     <div class="container" >
         <h3>New order</h3>
         <p>Please Enter following information</p>
@@ -70,12 +70,25 @@
             <div class="invalid-feedback">
                 Please enter starting date.
             </div>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Save order</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="validateDate()">Save order</button>
             <br>
 
         </form>
     </div>
 </form>
+
+<script>
+    function validateDate() {
+        let regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+        if(!(String(document.getElementById('date').value).match(regex))){
+            alert("wrong format, enter date in YYYY-MM-DD");
+            return false;  // Invalid format
+        }
+        else {
+            $("#formSave").submit();
+        }
+    }
+</script>
 
 </body>
 </html>
