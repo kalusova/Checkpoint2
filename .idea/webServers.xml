@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f69c4de3-e458-4809-9214-2b0f4d6449b0" name="norwes.cloud" url="http://kalusova.prevadzka.eu/semestralka">
+        <fileTransfer rootFolder="/web/semestralka" host="norwes.cloud" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
