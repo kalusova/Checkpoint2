@@ -1,0 +1,35 @@
+h2 {
+    color: #17a2b8;
+}
+body {
+    font-family: Georgia, serif;
+    text-align:center;
+}
+
+input[type=text], input[type=password] {
+    padding: 12px 100px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+button{
+    background-color: #17a2b8;
+    color: white;
+    padding: 14px 120px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.container{
+    padding: 16px;
+    align-content: center;
+}
+button:hover {
+    background-color: teal;
+    color: white;
+}
