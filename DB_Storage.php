@@ -41,12 +41,19 @@ class DB_Storage
         }
     }
     public function createOrder(string $name, string $surname, string $start, string $state) : void {
-        $sql = "INSERT INTO Orders (meno, priezvisko, start, state)
+
+        $datePattern = "/^\d{4}-\d{2}-\d{2}$/";
+
+        if(preg_match($datePattern,$start)){
+            $sql = "INSERT INTO Orders (meno, priezvisko, start, state)
                 VALUES ('$name', '$surname', '$start', '$state')";
-        if ($this->mysqli->query($sql) === TRUE) {
-            echo "New record created successfully";
+            if ($this->mysqli->query($sql) === TRUE) {
+                echo "New record created successfully";
+            } else {
+                echo "Error: " . $sql . "<br>" . $this->mysqli->error;
+            }
         } else {
-            echo "Error: " . $sql . "<br>" . $this->mysqli->error;
+            echo "enter date in YYYY-MM-DD";
         }
     }
 
@@ -72,12 +79,19 @@ class DB_Storage
 
     public function editOrder($id, $name, $surname, $accDate, $state) : void
     {
-        $sql = "UPDATE Orders SET meno= '$name', priezvisko='$surname', start='$accDate', end='', state='$state' WHERE id=$id";
-        if ($this->mysqli->query($sql) === TRUE) {
-            echo "Record updated successfully";
-        } else {
-            echo "Error updating record: " . $this->mysqli->error;
+
+        $datePattern = "/^\d{4}-\d{2}-\d{2}$/";
+        if(preg_match($datePattern,$accDate)){
+            $sql = "UPDATE Orders SET meno= '$name', priezvisko='$surname', start='$accDate', end='', state='$state' WHERE id=$id";
+            if ($this->mysqli->query($sql) === TRUE) {
+                echo "Record updated successfully";
+            } else {
+                echo "Error updating record: " . $this->mysqli->error;
+            }
+        }else {
+            echo "enter date in YYYY-MM-DD";
         }
+
     }
     public function editEnd($id, $end) : void
     {

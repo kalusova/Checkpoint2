@@ -43,6 +43,7 @@ ob_end_flush();
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <!-- CSS -->
+    <link rel="stylesheet" href="style.css" type="text/css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <!-- jQuery and JS bundle w/ Popper.js -->
@@ -89,7 +90,7 @@ ob_end_flush();
     <form class="form-inline my-2 my-lg-0">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        <button type="submit" class="btn btn-outline-success my-2 my-sm-0" formaction="index.html">Log out</button>
+        <button type="button" class="btn btn-outline-success my-2 my-sm-0" id="logOut">Log out</button>
     </form>
 </nav>
 
@@ -171,9 +172,73 @@ if (isset($_GET['edit'])) {
             </form>
         </div>
     </form>
+
+
+
     <?php
 } ?>
+<!-- The Modal -->
+<div id="myModal" class="modal" role="dialog" aria-hidden="true">
 
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Youre about to log ou.</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>ARE YOU SURE?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="yes">YES</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close" >NO</button>
+    </div>
+
+</div>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("logOut");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    var cls = document.getElementById("close");
+    var yes = document.getElementById("yes");
+
+    // When the user clicks the button, open the modal
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks on CLOSE, close the modal
+    cls.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks on CLOSE, close the modal
+    yes.onclick = function() {
+        modal.style.display = "none";
+        window.location.assign("index.html")
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 
 <script>
     function validateDate() {
