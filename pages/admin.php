@@ -1,29 +1,36 @@
 <?php
-ob_start();
+session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-include 'db_connect.php';
-include 'DB_Storage.php';
+include '../database/db_connect.php';
+include '../database/DB_Storage.php';
+
+/*if($_SESSION["LoginOK"] == 0){
+    echo "PRIHLASENIE OK";
+}else{
+    echo "PRIHLASENIE NOT OK";
+}*/
 
 $storage = new DB_Storage($mysqli);
 $orders = $storage->getAll();
 
 if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
-    $meno = $_POST["firstName"];
-    $priezvisko = $_POST["lastName"];
+    //$meno = $_POST["firstName"];
+    //$priezvisko = $_POST["lastName"];
+    $login = 0;
     $datum = $_POST["date"];
     //$login_ok = 0;
-    $storage->createOrder($meno, $priezvisko, $datum, "Open");
+    $storage->createOrder($login, $datum, "Open");
     header("Refresh:0");
 } elseif (isset($_GET['delete'])) {
     $idNum = intval($_GET['delete']);
     $storage->deleteRow($idNum);
-    header('Location: dashboard.php');
+    header('Location: admin.php');
 } elseif (isset($_GET['editState'])) {
     $id = intval($_GET['editState']);
     $state = "Sent";
     $storage->editState($id, $state);
-    header('Location: dashboard.php');
+    header('Location: admin.php');
 } elseif (isset($_POST['save'])) {
     echo "SOM TU";
     $id = intval($_GET['edit']);
@@ -32,18 +39,17 @@ if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
     $datum = $_POST["start"];
     $stav = 'Open';
     $storage->editOrder($id, $meno, $priezvisko, $datum, $stav);
-    header('Location: dashboard.php');
+    header('Location: admin.php');
 }
 
-ob_end_flush();
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Admin Dashboard</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <!-- jQuery and JS bundle w/ Popper.js -->
@@ -54,6 +60,15 @@ ob_end_flush();
 
 </head>
 <body>
+<?php
+if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
+?>
+
+    <script type="text/javascript">
+        function zmena(id, p) {
+
+        }
+    </script>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- Brand -->
@@ -82,14 +97,15 @@ ob_end_flush();
                 </div>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="form.html">New Order <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="newOrder.php">New Order <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="administration.php">Administration <span class="sr-only">(current)</span></a>
             </li>
         </ul>
     </div>
 
     <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         <button type="button" class="btn btn-outline-success my-2 my-sm-0" id="logOut">Log out</button>
     </form>
 </nav>
@@ -110,20 +126,20 @@ ob_end_flush();
 
             <?php foreach ($orders as $order) { ?>
                 <tr>
-                    <td><?php echo $order->getId() ?></td>
+                    <td><?php echo $order->getIdNumOrder() ?></td>
                     <td><?php echo $order->getName() ?></td>
                     <td><?php echo $order->getSurname() ?></td>
-                    <td><?php echo $order->getStart() ?></td>
-                    <td><?php echo $order->getEnd() ?></td>
+                    <td><?php echo $order->getAccDate() ?></td>
+                    <td><?php echo $order->getSendDate() ?></td>
                     <td><?php echo $order->getState() ?></td>
                     <td>
-                        <a href="?delete=<?= $order->getId() ?>"> <img
+                        <a href="?delete=<?= $order->getIdNumOrder() ?>"> <img
                                     src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png"
                                     alt="Delete" style="width:20px;height:20px;"> </a>
-                        <a href="?edit=<?= $order->getId() ?>"> <img
+                        <a href="?edit=<?= $order->getIdNumOrder() ?>"> <img
                                     src="https://cdn.pixabay.com/photo/2017/06/21/07/51/icon-2426370_1280.png"
                                     alt="Edit" style="width:20px;height:20px;"> </a>
-                        <a href="?editState=<?= $order->getId() ?>"> <img
+                        <a href="?editState=<?= $order->getIdNumOrder() ?>"> <img
                                     src="https://cdn1.iconfinder.com/data/icons/jetflat-multimedia-vol-4/90/0042_089_check_well_ready_okey-512.png"
                                     alt="EditState" style="width:20px;height:20px;"> </a>
                     </td>
@@ -138,7 +154,7 @@ ob_end_flush();
 if (isset($_GET['edit'])) {
     $id = intval($_GET['edit']);
     foreach ($orders as $order) {
-        if ($order->getId() == $id) {
+        if ($order->getIdNumOrder() == $id) {
             break;
         }
     }
@@ -146,28 +162,20 @@ if (isset($_GET['edit'])) {
     <form id="formUpdate" method="post">
         <div class="container">
             <h3>Update order</h3>
-            <p>Please Update following information</p>
-            <form class="needs-validation" novalidate>
-                <label for="firstName">First name</label><br>
-                <input type="text" class="w3-input w3-border" style="width:20%" name="firstName"
-                       id="firstName" value="<?= $order->getName() ?>" required>
-                <div class="invalid-feedback">
-                    Valid first name is required.
-                </div><br>
-                <label for="lastName">Last name</label><br>
-                <input type="text" class="w3-input w3-border" style="width:20%" name="lastName"
-                       id="lastName" value="<?= $order->getSurname() ?>" required>
-                <div class="invalid-feedback">
-                    Valid last name is required.
-                </div><br>
-                <label for="start">Acceptance Date</label><br>
-                <input type="text" class="w3-input w3-border" style="width:20%" name="start" id="start"
-                       value="<?= $order->getStart() ?>" required>
-                <div class="invalid-feedback">
-                    Please enter starting date.
-                </div><br>
-                <input type="submit" name="save" value="Odoslať">
-                <br><br>
+            <p>You are updating the order number <?= $order->getIdNumOrder()?> from customer <?= $order->getName()?> <?= $order->getSurname()?> :</p>
+
+            <label for="start">Please enter new acceptance Date</label><br>
+            <input type="text" style="padding-left: 10px" name="start" id="start"
+                   value="<?= $order->getAccDate() ?>" required>
+            <div class="invalid-feedback">
+                Please enter valid acceptance date.
+            </div><br>
+            <label for="start">Please enter new state</label><br>
+            <input type="text" style="padding-left: 10px" name="start" id="start"
+                   value="<?= $order->getState() ?>" required>
+            <br>
+            <input type="submit" name="save" value="Odoslať">
+            <br><br>
 
             </form>
         </div>
@@ -229,7 +237,7 @@ if (isset($_GET['edit'])) {
     // When the user clicks on CLOSE, close the modal
     yes.onclick = function() {
         modal.style.display = "none";
-        window.location.assign("index.html")
+        window.location.assign("login.php")
     }
 
     // When the user clicks anywhere outside of the modal, close it
@@ -253,6 +261,9 @@ if (isset($_GET['edit'])) {
     }
 </script>
 
-
+<?php } else { ?>
+    <script>window.location.assign("login.php")</script>
+<?php } ?>
 </body>
 </html>
+

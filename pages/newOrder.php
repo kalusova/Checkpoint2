@@ -12,7 +12,9 @@
 
 </head>
 <body>
-
+<?php
+if($_SESSION["LoginOK"] == 0){
+?>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- Brand -->
     <a class="navbar-brand" href="#"></a>
@@ -24,7 +26,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="dashboard.php">Overview <span class="sr-only"></span></a>
+                <a class="nav-link" href="admin.php">Overview <span class="sr-only"></span></a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,7 +40,7 @@
                 </div>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="form.html">New Order <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="newOrder.php">New Order <span class="sr-only">(current)</span></a>
             </li>
         </ul>
     </div>
@@ -50,7 +52,7 @@
     </form>
 </nav>
 
-<form id = "formSave" action="dashboard.php" method="post">
+<form id = "formSave" action="admin.php" method="post">
     <div class="container" >
         <h3>New order</h3>
         <p>Please Enter following information</p>
@@ -89,6 +91,8 @@
         }
     }
 </script>
-
+<?php } else { ?>
+    <script>window.location.assign("login.php")</script>
+<?php } ?>
 </body>
 </html>

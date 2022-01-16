@@ -1,9 +1,31 @@
 h2 {
-    color: #17a2b8;
+    color: #8A2BE2;
+}
+h1 {
+    font-family: Georgia, serif;
+    padding: 75px;
 }
 body {
     font-family: Georgia, serif;
     text-align:center;
+}
+
+.login {
+    background-image: url("https://wallpaperaccess.com/full/365674.png");
+    filter: fade(50);
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0;
+    height: 100%;
+}
+
+table {
+    background-color: white;
+}
+
+.uvod {
+    background-image: url("https://api.time.com/wp-content/uploads/2014/05/mrwallpapers.jpg");
+    background-size: cover;
 }
 
 input[type=text], input[type=password] {
@@ -16,7 +38,7 @@ input[type=text], input[type=password] {
 }
 
 button{
-    background-color: #17a2b8;
+    background-color: #6495ED;
     color: white;
     padding: 14px 120px;
     margin: 8px 0;
@@ -30,7 +52,7 @@ button{
     align-content: center;
 }
 button:hover {
-    background-color: teal;
+    background-color: #8A2BE2;
     color: white;
 }
 

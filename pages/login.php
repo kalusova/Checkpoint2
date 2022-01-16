@@ -1,17 +1,24 @@
+<?php
+session_start();
+$_SESSION["LoginOK"]=1;
+$_SESSION["role"] = '';
+$_SESSION["username"] = '';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Login</title>
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 
 
 </head>
-<body>
+<body class="login">
 
-<h2>Login</h2>
+<h2>Please enter your login information:</h2>
 
-<form action="check.php" method="post">
+<form action="../database/check.php" method="post">
 
     <div class="container">
         <label ><b>Username</b></label>
@@ -27,13 +34,10 @@
         <button type="submit">Login</button>
         <br>
 
-        <label><input type="checkbox" checked="checked" name="remember"> Remember me</label>
-    </div>
+        <span class="register">Don't have an account?</span>
+        <a class="register" href="registration.php">Register now!</a>
 
-    <div class="container" >
-        <a href="forgot.html">Forgot password?</a>
     </div>
 </form>
-
 </body>
 </html>
