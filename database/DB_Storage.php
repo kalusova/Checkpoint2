@@ -2,6 +2,7 @@
 declare(strict_types=1);
 include "../classes/Order.php";
 include "../classes/Customer.php";
+include "../classes/Invoice.php";
 
 class DB_Storage
 {
@@ -44,6 +45,18 @@ class DB_Storage
             }
         }
         return $customers;
+    }
+
+    public function getAllInvoices(){
+        $query = "SELECT * FROM invoice ";
+        $invs = [];
+        if($result = $this->mysqli->query($query)){
+            while($row = $result->fetch_row() ){
+                $inv = new Invoice($row[0], $row[1], $row[2]);
+                $invs[] = $inv;
+            }
+        }
+        return $invs;
     }
 
     function checkRegis(string $meno, string $priezvisko, string $login, string $passwd, string $email){
