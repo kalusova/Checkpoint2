@@ -5,6 +5,15 @@ h1 {
     font-family: Georgia, serif;
     padding: 75px;
 }
+
+.center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px;
+}
+
 body {
     font-family: Georgia, serif;
     text-align:center;

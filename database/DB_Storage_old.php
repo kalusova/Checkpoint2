@@ -71,36 +71,39 @@ class DB_Storage
 
     function newCustomer(string $meno, string $priezvisko, string $login, string $passwd, string $email){
         $hash_psw = password_hash($passwd, PASSWORD_DEFAULT);
-        //echo "PASSWD:".$hash_psw."<-";
         $idNumCust = uniqid();
         $role = "customer";
-        $stmt_user = $this->mysqli->prepare("INSERT INTO user (login, password, role) VALUES (?, ?, ?)");
+        $stmt_user = $this->mysqli->prepare("INSERT INTO 'user' (login, password, role) VALUES (?,'$hash_psw', '$role')");
         $stmt_customer = $this->mysqli->prepare("INSERT INTO customer (idNumCust, name, surname, login, email) VALUES ('$idNumCust',?, ?, ?, ?)");
-        
-        $stmt_user->bind_param("sss", $login, $hash_psw, $role);
-        $stmt_user->execute();
 
-        $stmt_customer->bind_param("ssss", $meno, $priezvisko, $login, $email);
-        $stmt_customer->execute();
+        if( $stmt_user && $stmt_customer) {
 
-        if ($stmt_user->affected_rows + $stmt_customer->affected_rows == 2) { echo "OK";}
+            $stmt_user->bind_param("s", $login);
+            $stmt_customer->bind_param("ssss", $meno, $priezvisko, $login, $email);
 
-        /*echo "tu som";
+            //$stmt_user->execute();
+            $stmt_customer->execute();
 
-        // kontrola uspesnosti
-        echo "USER:".$stmt_user->affected_rows;*/
+            if($stmt_user->execute()){
+                echo "TU SOM";
+            }else{
+                echo "NEPRESLO";
+            }
+            $stmt_user->close();
+            $stmt_customer->close();
 
+            $_SESSION["LoginOK"]=0;
+            $_SESSION["role"] = 'customer';
+            $_SESSION["username"] = $login;
 
-        $stmt_user->close();
-        $stmt_customer->close();
-
-        $_SESSION["LoginOK"]=0;
-        $_SESSION["role"] = 'customer';
-        $_SESSION["username"] = $login;
-
-        //header("LOCATION: ../pages/index.php");
-        
+            //header("LOCATION: ../pages/index.php");
+        }
     }
+
+
+
+
+
 
 
 

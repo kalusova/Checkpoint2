@@ -10,18 +10,25 @@ $admin = 0;
 $customer = 0;
 
 
-$sql = "SELECT count(*) as pocet FROM user where login='".$meno_login."' and password='".$heslo_login."'";
+$sql = "SELECT password FROM user where login='".$meno_login."'";
 
 if ($result = $mysqli -> query($sql)) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $login_ok=$row["pocet"];
-    }
-}
+    $row = mysqli_fetch_assoc($result);
+    $heslo_hash=$row["password"];
+    if(password_verify($heslo_login,$heslo_hash)){
+        //echo'Password is valid!';
+        $login_ok=1;
 
-$query = "SELECT * FROM user u where login='".$meno_login."' and password='".$heslo_login."'";
-if($result = $mysqli->query($query)){
-    $row = $result->fetch_row() ;
-    $role = $row[2];
+        $query = "SELECT role FROM user where login='".$meno_login."'";
+
+        if($result = $mysqli->query($query)){
+            $row = mysqli_fetch_assoc($result);
+            $role = $row["role"];
+        }
+    }else{
+        //echo'Invalid password.';
+        $login_ok=0;
+    }
 }
 
 $result -> free_result();
@@ -35,7 +42,6 @@ else {
     $_SESSION["LoginOK"] =  "1" ;
 }
 
-echo $role;
 if ($role == 'admin') {
     $admin = 1;
     $_SESSION["role"] = $role;

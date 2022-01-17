@@ -12,7 +12,7 @@ include '../database/DB_Storage.php';
 }*/
 
 $storage = new DB_Storage($mysqli);
-$orders = $storage->getAll();
+$orders = $storage->getAllOrders();
 
 if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
     //$meno = $_POST["firstName"];
@@ -63,13 +63,6 @@ if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
 <?php
 if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
 ?>
-
-    <script type="text/javascript">
-        function zmena(id, p) {
-
-        }
-    </script>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- Brand -->
     <a class="navbar-brand" href="#"></a>
@@ -82,22 +75,7 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Overview <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Orders
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Waiting</a>
-                    <a class="dropdown-item" href="#">Closed</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">All orders</a>
-                </div>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="newOrder.php">New Order <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="admin.php">Dashboard <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="administration.php">Administration <span class="sr-only">(current)</span></a>
@@ -111,7 +89,7 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
 </nav>
 
     <div class="container">
-        <h2>List of orders</h2>
+        <h2>Orders</h2>
         <table class="table table-hover">
             <thead>
             <tr>
