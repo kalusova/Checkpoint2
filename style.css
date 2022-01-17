@@ -6,6 +6,10 @@ h1 {
     padding: 75px;
 }
 
+h3 {
+    color: cadetblue;
+}
+
 .center {
     position: absolute;
     left: 50%;
@@ -26,6 +30,14 @@ body {
     background-size: cover;
     margin: 0;
     height: 100%;
+}
+
+.nazvy{
+    background-color: lightsteelblue;
+}
+.tabulka {
+    padding: 16px;
+    align-content: center;
 }
 
 table {

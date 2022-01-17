@@ -29,7 +29,6 @@ class DB_Storage
             }
         }
         return $orders;
-
     }
 
     /**
@@ -73,6 +72,7 @@ class DB_Storage
         $hash_psw = password_hash($passwd, PASSWORD_DEFAULT);
         $idNumCust = uniqid();
         $role = "customer";
+
         $stmt_user = $this->mysqli->prepare("INSERT INTO user (login, password, role) VALUES (?, ?, ?)");
         $stmt_customer = $this->mysqli->prepare("INSERT INTO customer (idNumCust, name, surname, login, email) VALUES ('$idNumCust',?, ?, ?, ?)");
         
@@ -114,62 +114,17 @@ class DB_Storage
 
     }
 
-
-
-
-
-
-
-
-
-
-
-    /**
-     * @param Order $order
-     */
-    public function saveOrder(Order $order) : void {
-        $sql = "INSERT INTO eshopOrder (login, accDate, sendDate, state, invoice)
-                VALUES ('$order->getLogin()', '$order->getAccDate()', '$order->getSendDate()', '$order->getState()', '$order->getInvoiceNum()')";
-
-        if ($this->mysqli->query($sql) === TRUE) {
-            echo "New record created successfully";
-        } else {
-            echo "Error: " . $sql . "<br>" . $this->mysqli->error;
-        }
-    }
-
-    /**
-     * @param string $login
-     * @param string $start
-     * @param string $state
-     */
-   public function createOrder(string $login, string $start, string $state) : void {
-
-        $datePattern = "/^\d{4}-\d{2}-\d{2}$/";
-
-        if(preg_match($datePattern,$start)){
-            $sql = "INSERT INTO eshopOrder ( login, start, state)
-                VALUES ('$login', '$start', '$state')";
-            if ($this->mysqli->query($sql) === TRUE) {
-                echo "New record created successfully";
-            } else {
-                echo "Error: " . $sql . "<br>" . $this->mysqli->error;
-            }
-        } else {
-            echo "enter date in YYYY-MM-DD";
-        }
-    }
-
     /**
      * @param int $id
      */
-    public function deleteRow(int $id) : void
+    public function deleteOrder(int $id) : void
     {
-        $sql = "DELETE FROM eshopOrder WHERE idNumOrder=$id";
+        $sql = "DELETE e.*, i.* FROM eshopOrder e, invoice i WHERE e.invoice = i.idNumInv AND e.idNumOrder=$id";
         if ($this->mysqli->query($sql) === TRUE) {
-            echo "Record deleted successfully";
+            //echo "Record deleted successfully";
+            header('Location: admin.php');
         } else {
-            echo "Error deleting record: " . $this->mysqli->error;
+            echo '<script>alert("Error deleting record")</script>';
         }
     }
 
@@ -179,24 +134,92 @@ class DB_Storage
      */
     public function editState($id, $state) : void
     {
-        $sql = "UPDATE eshopOrder SET state='$state', end= current_date WHERE idNumOrder=$id";
+        $sql = "UPDATE eshopOrder SET state='$state', sendDate= current_date WHERE idNumOrder=$id";
         if ($this->mysqli->query($sql) === TRUE) {
-            echo "Record updated successfully";
+            //echo "Record updated successfully";
+            //header('Location: admin.php');
         } else {
-            echo "Error updating record: " . $this->mysqli->error;
+            echo '<script>alert("Error updating record")</script>';
         }
     }
 
-
-
-
-    public function editEnd($id, $end) : void
+    /**
+     * @param $login
+     * @param $meno
+     * @param $priezvisko
+     * @param $email
+     */
+    public function editCustomer($meno, $priezvisko, $login, $email) : void
     {
-        $sql = "UPDATE eshopOrder SET sendDate='$end', state='Sent' WHERE idNumOrder=$id";
+        $sql = "UPDATE customer SET name= '$meno', surname='$priezvisko' , email='$email' WHERE login='$login'";
         if ($this->mysqli->query($sql) === TRUE) {
-            echo "Record updated successfully";
+            echo "Zaznam aktualizovany!";
+            header('Location: administration.php');
         } else {
             echo "Error updating record: " . $this->mysqli->error;
+            //echo 'Error updating record';
         }
     }
+
+    /**
+     * @param int $id
+     */
+    public function deleteCustomer($login) : void
+    {
+        /* Start transaction */
+        $this->mysqli->begin_transaction();
+        //echo "jahdkjagsd";
+        try {
+
+            $sql = "delete o, i from eshopOrder o, invoice i where o.login = '$login' and i.idNumInv = o.invoice;";
+            //echo $sql;
+            $this->mysqli->query($sql);
+
+            $this->mysqli->commit();
+
+            $sql = "delete u, c from user u, customer c where u.login = '$login' and u.login = c.login;";
+            //echo $sql;
+            $this->mysqli->query($sql);
+
+            $this->mysqli->commit();
+
+        } catch (mysqli_sql_exception $exception) {
+            $this->mysqli->rollback();
+            throw $exception;
+        }
+    }
+
+//delete u, c, o, i from user u, customer c, eshopOrder o, invoice i where u.login = 'kkalusova' and c.login = u.login and o.login=u.login and i.idNumInv = o.invoice;
+
+    /**
+     * @param string $login
+     * @param string $start
+     * @param string $state
+     */
+    public function createOrder(string $login) : void {
+        $invoice = uniqid();
+
+        /* Start transaction */
+        $this->mysqli->begin_transaction();
+        try {
+            $sql = "INSERT INTO eshopOrder ( login, accDate, state, invoice) VALUES ('$login', current_date, 'registered', '$invoice');";
+            //echo $sql;
+            $this->mysqli->query($sql);
+            $this->mysqli->commit();
+
+            $sql = "INSERT INTO invoice ( idNumInv, issueDate) VALUES ('$invoice', current_date);";
+            //echo $sql;
+            $this->mysqli->query($sql);
+            $this->mysqli->commit();
+
+            $_SESSION['objednane'] = 1;
+            echo '<script>alert("Dakujeme za objednavku!")</script>';
+
+        } catch (mysqli_sql_exception $exception) {
+            $this->mysqli->rollback();
+            throw $exception;
+        }
+
+    }
+
 }

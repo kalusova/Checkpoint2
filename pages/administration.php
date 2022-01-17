@@ -8,19 +8,6 @@ include '../database/DB_Storage.php';
 $storage = new DB_Storage($mysqli);
 $customers = $storage->getAllCustomers();
 
-if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
-
-    header("Refresh:0");
-} elseif (isset($_GET['delete'])) {
-
-    header('Location: admin.php');
-} elseif (isset($_GET['editState'])) {
-
-    header('Location: admin.php');
-} elseif (isset($_POST['save'])) {
-
-    header('Location: admin.php');
-}
 
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,6 +31,38 @@ if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
 if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
 ?>
 
+<script type="text/javascript">
+    function vymazZakaznika(zakaznik_login) {
+        //alert("click");
+        $.post("../database/customer_delete.php", {login: zakaznik_login},
+            function(data){
+                alert(data);
+                if (data == "OK") { // ak je vsetko OK
+                    window.location.href = "administration.php";
+                }
+
+            });
+    }
+
+    function zmena(ident) {
+        let meno_val = $('#meno_'+ident).val();
+        let priezvisko_val = $('#priezvisko_'+ident).val();
+        let login_val = $('#login_'+ident).val();
+        let email_val = $('#email_'+ident).val();
+
+        $.post("../database/customer_save.php", {meno: meno_val, priezvisko: priezvisko_val, login: login_val, email: email_val},
+            function(data){
+                alert(data);
+
+                //window.alert(meno_val +" "+ priezvisko_val +" "+ login_val +" "+ email_val);
+                if (data == "OK") { // ak je vsetko OK
+                    window.location.href = "administration.php";
+                }
+
+            });
+    }
+</script>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- Brand -->
     <a class="navbar-brand" href="#"></a>
@@ -59,7 +78,10 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
                 <a class="nav-link" href="admin.php">Dashboard <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="administration.php">Administration <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="administration.php" style="font-weight: bold">Administration <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="invoices.php">Invoices <span class="sr-only">(current)</span></a>
             </li>
         </ul>
     </div>
@@ -68,34 +90,26 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
         <button type="button" class="btn btn-outline-success my-2 my-sm-0" id="logOut">Log out</button>
     </form>
 </nav>
-
-<div class="container">
-    <h2>Customers</h2>
-    <table class="table table-hover">
+<div>
+    <table>
         <thead>
-        <tr>
+        <tr class="nazvy">
             <th scope="col">Login</th>
             <th scope="col">Name</th>
             <th scope="col">Surname</th>
-            <th scope="col">Actions</th>
+            <th scope="col">Email</th>
+            <th scope="col">Action</th>
         </tr>
 
         <?php foreach ($customers as $customer) { ?>
             <tr>
-                <td><?php echo $customer->getLogin() ?></td>
-                <td><?php echo $customer->getName() ?></td>
-                <td><?php echo $customer->getSurname() ?></td>
-                <td>
-                    <a href="?delete=<?= $customer->getIdNumCust() ?>"> <img
-                            src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png"
-                            alt="Delete" style="width:20px;height:20px;"> </a>
-                    <a href="?edit=<?= $customer->getIdNumCust() ?>"> <img
-                            src="https://cdn.pixabay.com/photo/2017/06/21/07/51/icon-2426370_1280.png"
-                            alt="Edit" style="width:20px;height:20px;"> </a>
-                    <a href="?editState=<?= $customer->getIdNumCust() ?>"> <img
-                            src="https://cdn1.iconfinder.com/data/icons/jetflat-multimedia-vol-4/90/0042_089_check_well_ready_okey-512.png"
-                            alt="EditState" style="width:20px;height:20px;"> </a>
-                </td>
+                <td><input disabled id="login_<?= $customer->getLogin() ?>" type="text" value="<?php echo $customer->getLogin() ?>"></td>
+                <td><input autocomplete="off" id="meno_<?= $customer->getLogin() ?>" onchange="zmena('<?= $customer->getLogin() ?>');" maxlength="500"  type="text" value="<?php echo $customer->getName() ?>"></td>
+                <td><input autocomplete="off" id="priezvisko_<?= $customer->getLogin() ?>" onchange="zmena('<?= $customer->getLogin() ?>');" maxlength="500"  type="text" value="<?php echo $customer->getSurname() ?>"></td>
+                <td><input autocomplete="off" id="email_<?= $customer->getLogin() ?>" onchange="zmena('<?= $customer->getLogin() ?>');" maxlength="500"  type="text" value="<?php echo $customer->getEmail() ?>"></td>
+                <td><a onclick="vymazZakaznika('<?= $customer->getLogin() ?>');"> <img
+                                src="https://cdn.pixabay.com/photo/2014/03/25/15/19/cross-296507_960_720.png"
+                                alt="Delete" style="width:20px;height:20px;"> </a></td>
             </tr>
             <?php
         } ?>
@@ -103,38 +117,6 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
     </table>
 </div>
 
-<?php
-if (isset($_GET['edit'])) {
-    $id = intval($_GET['edit']);
-    foreach ($customers as $customer) {
-        if ($customer->getIdNumCust() == $id) {
-            break;
-        }
-    }
-    ?>
-    <form id="formUpdate" method="post">
-        <div class="container">
-            <h3>Update <?= $customer->getLogin()?>'s details</h3>
-            <label for="start">Please enter new name</label><br>
-            <input type="text" style="padding-left: 10px" name="start" id="start"
-                   value="<?= $customer->getName() ?>" required>
-            <div class="invalid-feedback">
-                Please enter valid acceptance date.
-            </div><br>
-            <label for="start">Please enter new surname</label><br>
-            <input type="text" style="padding-left: 10px" name="start" id="start"
-                   value="<?= $customer->getSurname() ?>" required>
-            <br>
-            <input type="submit" name="save" value="Odoslať">
-            <br><br>
-    </form>
-    </div>
-    </form>
-
-
-
-    <?php
-} ?>
 <!-- The Modal -->
 <div id="myModal" class="modal" role="dialog" aria-hidden="true">
 
@@ -155,7 +137,7 @@ if (isset($_GET['edit'])) {
         </div>
 
     </div>
-
+</div>
     <script>
         // Get the modal
         var modal = document.getElementById("myModal");
@@ -199,6 +181,7 @@ if (isset($_GET['edit'])) {
     </script>
 
     <script>
+
         function validateDate() {
             let regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 

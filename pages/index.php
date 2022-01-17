@@ -1,6 +1,15 @@
 <?php
 session_start();
-//echo "Hello customer";
+
+include '../database/db_connect.php';
+include '../database/DB_Storage.php';
+$storage = new DB_Storage($mysqli);
+
+if (isset($_GET['objednaj'])) {
+$username = $_GET['objednaj'];
+$storage->createOrder($username);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +29,6 @@ session_start();
 
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
     </div>
@@ -56,10 +64,15 @@ session_start();
         <div class="col-sm-4">
             <h3>Chceš si nás objednať?</h3>
             <?php
-            if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'customer'){
+            if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'customer' && $_SESSION['objednane'] == 0){
             ?>
-                <a type="button" href = "#" id="objednaj" >Objednaj služby!</a><br>
-            <?php } else {?>
+                <a type="button" href = "?objednaj=<?= $_SESSION["username"] ?>" id="objednaj_btn" >Objednaj služby!</a><br>
+            <?php } else if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'customer' && $_SESSION['objednane'] == 1) {
+            ?>
+                <p>Uz mas objednane, pokial mas zaujem urobit novu objednavku tak:</p>
+                <a type="button" href = "?objednaj=<?= $_SESSION["username"] ?>" id="objednaj_btn" >Objednaj ZNOVA!</a><br>
+            <?php
+            } else {?>
                 <p>Pre objednanie je potrebné sa prihlásiť alebo zaregistrovať!</p>
                 <a href = "login.php">Pre PRIHLÁSENIE klikni sem!</a><br>
                 <a href = "../pages/registration.php">Pre REGISTRÁCIU klikni sem!</a>
@@ -68,6 +81,8 @@ session_start();
         </div>
     </div>
 </div>
+
+
 
 </body>
 </html>

@@ -5,33 +5,18 @@ error_reporting(E_ALL);
 include '../database/db_connect.php';
 include '../database/DB_Storage.php';
 
-/*if($_SESSION["LoginOK"] == 0){
-    echo "PRIHLASENIE OK";
-}else{
-    echo "PRIHLASENIE NOT OK";
-}*/
-
 $storage = new DB_Storage($mysqli);
 $orders = $storage->getAllOrders();
 
-if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
-    //$meno = $_POST["firstName"];
-    //$priezvisko = $_POST["lastName"];
-    $login = 0;
-    $datum = $_POST["date"];
-    //$login_ok = 0;
-    $storage->createOrder($login, $datum, "Open");
-    header("Refresh:0");
-} elseif (isset($_GET['delete'])) {
+if (isset($_GET['delete'])) { // OK
     $idNum = intval($_GET['delete']);
-    $storage->deleteRow($idNum);
-    header('Location: admin.php');
-} elseif (isset($_GET['editState'])) {
+    $storage->deleteOrder($idNum);
+} elseif (isset($_GET['editState'])) {// OK
     $id = intval($_GET['editState']);
     $state = "Sent";
     $storage->editState($id, $state);
     header('Location: admin.php');
-} elseif (isset($_POST['save'])) {
+} elseif (isset($_POST['save'])) { // OK
     $id = intval($_GET['edit']);
     $datum = $_POST["start"];
     $stav = $_POST["state"];
@@ -71,10 +56,13 @@ if($_SESSION["LoginOK"] == 0 && $_SESSION["role"] == 'admin'){
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="admin.php">Dashboard <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="admin.php" style="font-weight: bold">Dashboard <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="administration.php">Administration <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="invoices.php">Invoices <span class="sr-only">(current)</span></a>
             </li>
         </ul>
     </div>
@@ -155,17 +143,15 @@ if (isset($_GET['edit'])) {
         </div>
     </form>
 
-
-
     <?php
 } ?>
-<!-- The Modal -->
+<!-- The Modal SRC= https://getbootstrap.com/docs/4.0/components/modal/ -->
 <div id="myModal" class="modal" role="dialog" aria-hidden="true">
 
     <!-- Modal content -->
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Youre about to log ou.</h5>
+            <h5 class="modal-title">You're about to log ou.</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -181,17 +167,11 @@ if (isset($_GET['edit'])) {
 </div>
 
 <script>
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get the button that opens the modal
-    var btn = document.getElementById("logOut");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    var cls = document.getElementById("close");
-    var yes = document.getElementById("yes");
+    let modal = document.getElementById("myModal");
+    let btn = document.getElementById("logOut");
+    let span = document.getElementsByClassName("close")[0];
+    let cls = document.getElementById("close");
+    let yes = document.getElementById("yes");
 
     // When the user clicks the button, open the modal
     btn.onclick = function() {
@@ -220,7 +200,9 @@ if (isset($_GET['edit'])) {
             modal.style.display = "none";
         }
     }
+</script>
 
+<script>
     function validateDate() {
         let regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 
