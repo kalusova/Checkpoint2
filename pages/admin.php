@@ -32,14 +32,10 @@ if (isset($_POST["firstName"]) and !(isset($_GET['edit']))) {
     $storage->editState($id, $state);
     header('Location: admin.php');
 } elseif (isset($_POST['save'])) {
-    echo "SOM TU";
     $id = intval($_GET['edit']);
-    $meno = $_POST["firstName"];
-    $priezvisko = $_POST["lastName"];
     $datum = $_POST["start"];
-    $stav = 'Open';
-    $storage->editOrder($id, $meno, $priezvisko, $datum, $stav);
-    header('Location: admin.php');
+    $stav = $_POST["state"];
+    $storage->editOrder($id, $datum, $stav);
 }
 
 ?>
@@ -148,8 +144,8 @@ if (isset($_GET['edit'])) {
             <div class="invalid-feedback">
                 Please enter valid acceptance date.
             </div><br>
-            <label for="start">Please enter new state</label><br>
-            <input type="text" style="padding-left: 10px" name="start" id="start"
+            <label for="state">Please enter new state</label><br>
+            <input type="text" style="padding-left: 10px" name="state" id="state"
                    value="<?= $order->getState() ?>" required>
             <br>
             <input type="submit" name="save" value="Odoslať">
@@ -224,9 +220,7 @@ if (isset($_GET['edit'])) {
             modal.style.display = "none";
         }
     }
-</script>
 
-<script>
     function validateDate() {
         let regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 

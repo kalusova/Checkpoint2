@@ -1,8 +1,7 @@
 <?php
 require_once "db_connect.php";
 require_once "DB_Storage.php";
- 
-// hodnoty zaslane cez POST
+
 $meno_val = $_POST["meno"];
 $priezvisko_val = $_POST["priezvisko"];
 $login_val = $_POST["login"];
@@ -32,3 +31,4 @@ $email_val = $_POST["email"];
             $storage = new DB_Storage($mysqli);
             $storage->newCustomer($meno_val, $priezvisko_val, $login_val, $passwd_val, $email_val);
         }
+?>

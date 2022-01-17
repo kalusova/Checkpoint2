@@ -71,7 +71,6 @@ class DB_Storage
 
     function newCustomer(string $meno, string $priezvisko, string $login, string $passwd, string $email){
         $hash_psw = password_hash($passwd, PASSWORD_DEFAULT);
-        //echo "PASSWD:".$hash_psw."<-";
         $idNumCust = uniqid();
         $role = "customer";
         $stmt_user = $this->mysqli->prepare("INSERT INTO user (login, password, role) VALUES (?, ?, ?)");
@@ -83,24 +82,42 @@ class DB_Storage
         $stmt_customer->bind_param("ssss", $meno, $priezvisko, $login, $email);
         $stmt_customer->execute();
 
-        if ($stmt_user->affected_rows + $stmt_customer->affected_rows == 2) { echo "OK";}
-
-        /*echo "tu som";
-
-        // kontrola uspesnosti
-        echo "USER:".$stmt_user->affected_rows;*/
-
+        if ($stmt_user->affected_rows + $stmt_customer->affected_rows == 2) {
+            echo "OK";
+            $_SESSION["LoginOK"]=0;
+            $_SESSION["role"] = 'customer';
+            $_SESSION["username"] = $login;
+        }
 
         $stmt_user->close();
         $stmt_customer->close();
-
-        $_SESSION["LoginOK"]=0;
-        $_SESSION["role"] = 'customer';
-        $_SESSION["username"] = $login;
-
-        //header("LOCATION: ../pages/index.php");
-        
     }
+
+    /**
+     * @param Order $order
+     */
+    public function editOrder($id, $datum, $stav) : void
+    {
+        $datePattern = "/^\d{4}-\d{2}-\d{2}$/";
+        if(preg_match($datePattern,$datum)){
+            $sql = "UPDATE eshopOrder SET accDate= '$datum', state='$stav' WHERE idNumOrder=$id";
+            if ($this->mysqli->query($sql) === TRUE) {
+                //echo "Record updated successfully";
+                header('Location: admin.php');
+            } else {
+                //echo "Error updating record: " . $this->mysqli->error;
+                echo '<script>alert("Error updating record")</script>';
+            }
+        } else {
+            echo '<script>alert("enter date in YYYY-MM-DD")</script>';
+        }
+
+    }
+
+
+
+
+
 
 
 
@@ -170,25 +187,7 @@ class DB_Storage
         }
     }
 
-    /**
-     * @param Order $order
-     */
-    public function editOrder(Order $order) : void
-    {
 
-        $datePattern = "/^\d{4}-\d{2}-\d{2}$/";
-        if(preg_match($datePattern,$order->getAccDate())){
-            $sql = "UPDATE eshopOrder SET accDate= '$order->getAccDate()', sendDate='$order->getSendDate()', state='$order->getState()' WHERE idNumOrger=$order->getIdNumOrger()";
-            if ($this->mysqli->query($sql) === TRUE) {
-                echo "Record updated successfully";
-            } else {
-                echo "Error updating record: " . $this->mysqli->error;
-            }
-        }else {
-            echo "enter date in YYYY-MM-DD";
-        }
-
-    }
 
 
     public function editEnd($id, $end) : void
