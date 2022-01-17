@@ -20,6 +20,4 @@ $storage = new DB_Storage($mysqli);
  
 $storage->newCustomer($meno_val, $priezvisko_val, $login_val, $passwd_val, $email_val);
 
-//echo "Koniec";
-
 ?>
